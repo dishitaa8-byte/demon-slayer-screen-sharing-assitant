@@ -1,0 +1,34 @@
+# FRIDAY - Screen Sharing Assistant
+# Python Dependencies
+#
+# This file lists all the Python libraries (packages) needed for the project.
+# To install these, run: pip install -r requirements.txt
+#
+# What is pip?
+# - pip is Python's package installer (like npm for JavaScript)
+# - It downloads and installs libraries from the Python Package Index (PyPI)
+# - PyPI is a central repository of Python packages
+
+# Flask - Web framework for building the web server
+# This handles HTTP requests and responses
+Flask==3.0.0
+
+# mss - Fast screen capture library
+# This takes screenshots of your screen
+mss==9.0.1
+
+# Pillow - Python Imaging Library
+# Used for image processing and manipulation
+Pillow==10.4.0
+
+# openai - OpenAI Python SDK
+# Used to communicate with NVIDIA's OpenAI-compatible API
+openai==1.54.0
+
+# httpx - HTTP client library (required by openai)
+# Provides async HTTP support for the OpenAI SDK
+httpx==0.27.2
+
+# python-dotenv - Load environment variables from .env file
+# Keeps sensitive configuration (API keys) separate from source code
+python-dotenv==1.0.1
