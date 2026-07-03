@@ -16,6 +16,7 @@ from llm import friday
 from vision import vision
 import base64
 import traceback
+import os
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -163,13 +164,11 @@ def internal_error(error):
 if __name__ == '__main__':
     """
     Run the Flask development server.
-    
+
     In production, use a proper WSGI server like Gunicorn or uWSGI.
     """
-import os
-
-app.run(
-    debug=False,
-    host="0.0.0.0",
-    port=int(os.environ.get("PORT", 5000))
-)
+    app.run(
+        debug=False,
+        host="0.0.0.0",
+        port=int(os.environ.get("PORT", 5000))
+    )
