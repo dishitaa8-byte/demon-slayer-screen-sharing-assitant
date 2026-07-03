@@ -53,6 +53,8 @@ def chat():
         
         if not user_message:
             return jsonify({'error': 'Message cannot be empty'}), 400
+        print("History length:", friday.get_history_length())
+          
         
         # Get response from FRIDAY
         response = friday.ask_friday(user_message)
@@ -164,4 +166,10 @@ if __name__ == '__main__':
     
     In production, use a proper WSGI server like Gunicorn or uWSGI.
     """
-    app.run(debug=True, host='0.0.0.0', port=5000)
+import os
+
+app.run(
+    debug=False,
+    host="0.0.0.0",
+    port=int(os.environ.get("PORT", 5000))
+)

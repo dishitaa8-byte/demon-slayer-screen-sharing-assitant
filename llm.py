@@ -117,6 +117,7 @@ Always think carefully before answering."""
         try:
             # Create the chat completion request with streaming enabled
             # stream=True makes the response come in chunks
+            print("Before API call")
             stream = self.client.chat.completions.create(
                 model=Config.MODEL_NAME,
                 messages=self.conversation_history,
@@ -124,6 +125,7 @@ Always think carefully before answering."""
                 temperature=0.7,  # Controls randomness (0.0 = deterministic, 1.0 = creative)
                 max_tokens=2048   # Maximum length of response
             )
+            print("API call returned")
             
             # Collect the complete response
             complete_response = ""
