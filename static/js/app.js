@@ -345,58 +345,80 @@ function updateSendButton() {
  * Capture screen and analyze it
  */
 async function captureAndAnalyze() {
-    // Add loading state to capture button
     captureButton.classList.add('loading');
-    
+
     try {
-        // Capture screen
-        const captureResponse = await fetch('/api/capture', {
-            method: 'POST'
+        // Ask browser to share the screen
+        const stream = await navigator.mediaDevices.getDisplayMedia({
+            video: true
         });
-        
-        const captureData = await captureResponse.json();
-        
-        if (!captureResponse.ok) {
-            showNotification('error', 'Capture Failed', captureData.error);
-            return;
-        }
-        
-        // Ask user for question
-        const question = prompt('What would you like to know about this screen?');
-        
+
+        // Create video element
+        const video = document.createElement('video');
+        video.srcObject = stream;
+
+        await video.play();
+
+        // Draw one frame to canvas
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(video, 0, 0);
+
+        // Stop sharing immediately
+        stream.getTracks().forEach(track => track.stop());
+
+        // Convert image to Base64
+        const image = canvas.toDataURL('image/png');
+
+        // Ask the user what they want to know
+        const question = prompt("What would you like to know about this screen?");
+
         if (!question || !question.trim()) {
             return;
         }
-        
-        // Analyze the screen
+
+        // Send image directly to backend
         const analyzeResponse = await fetch('/api/analyze', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                image: captureData.image,
+                image: image,
                 question: question.trim()
             })
         });
-        
+
         const analyzeData = await analyzeResponse.json();
-        
+
         if (analyzeResponse.ok) {
-            // Add analysis to chat
-            addMessage(`Screen Analysis: ${analyzeData.analysis}`, 'assistant');
+            addMessage(
+                `Screen Analysis: ${analyzeData.analysis}`,
+                "assistant"
+            );
         } else {
-            showNotification('error', 'Analysis Failed', analyzeData.error);
+            showNotification(
+                "error",
+                "Analysis Failed",
+                analyzeData.error
+            );
         }
-        
-    } catch (error) {
-        showNotification('error', 'Network Error', 'Failed to connect to the server. Please check your connection.');
+
+    } catch (err) {
+        console.error(err);
+
+        showNotification(
+            "error",
+            "Capture Failed",
+            err.message
+        );
     } finally {
-        // Remove loading state
-        captureButton.classList.remove('loading');
+        captureButton.classList.remove("loading");
     }
 }
-
 /**
  * Handle image upload
  */
