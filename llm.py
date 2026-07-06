@@ -28,7 +28,7 @@ from openai import OpenAI
 from config import Config
 # Import sys for exiting on critical errors
 import sys
-
+import traceback
 class FridayLLM:
     """
     FRIDAY's LLM interface class.
@@ -117,66 +117,42 @@ Always think carefully before answering."""
         try:
             # Create the chat completion request with streaming enabled
             # stream=True makes the response come in chunks
-            print("Before API call")
+            import time
+
+            start = time.time()
+
+            print("Calling NVIDIA API...")
             stream = self.client.chat.completions.create(
                 model=Config.MODEL_NAME,
                 messages=self.conversation_history,
-                stream=True,
+                stream=False,
                 temperature=0.7,  # Controls randomness (0.0 = deterministic, 1.0 = creative)
                 max_tokens=2048   # Maximum length of response
             )
-            print("API call returned")
+            print("Request accepted after:",
+            time.time() - start)
             
-            # Collect the complete response
-            complete_response = ""
-            
-            # Process the stream chunk by chunk
-            print("FRIDAY: ", end="", flush=True)  # Print prefix without newline
-            
-            for chunk in stream:
-                # Each chunk contains a delta (change) with the new content
-                if chunk.choices and chunk.choices[0].delta.content:
-                    # Extract the content from the chunk
-                    content = chunk.choices[0].delta.content
-                    # Print it immediately for streaming effect
-                    print(content, end="", flush=True)
-                    # Add to complete response
-                    complete_response += content
-            
-            print()  # New line after response is complete
-            
-            # Validate we got a response
+            complete_response = stream.choices[0].message.content
+
+            print("FRIDAY:", complete_response)
+
             if not complete_response or not complete_response.strip():
                 raise ValueError("Received empty response from API")
-            
-            # Add AI response to conversation history
+
             self.conversation_history.append({
                 "role": "assistant",
                 "content": complete_response
-            })
-            
+})
             return complete_response
             
+           
+            
         except Exception as e:
-            # Handle different types of errors
-            error_message = str(e)
-            
-            # Check for authentication errors (invalid API key)
-            if "authentication" in error_message.lower() or "unauthorized" in error_message.lower():
-                raise ValueError(f"Invalid NVIDIA API key. Please check your .env file. Error: {error_message}")
-            
-            # Check for rate limit errors
-            elif "rate limit" in error_message.lower() or "429" in error_message:
-                raise Exception(f"Rate limit exceeded. Please wait and try again. Error: {error_message}")
-            
-            # Check for network/connection errors
-            elif "connection" in error_message.lower() or "network" in error_message.lower():
-                raise ConnectionError(f"Network error: {error_message}")
-            
-            # Generic error
-            else:
-                raise Exception(f"API Error: {error_message}")
     
+            traceback.print_exc()
+            raise
+            
+          
     def clear_history(self):
         """
         Clear the conversation history (except system prompt).

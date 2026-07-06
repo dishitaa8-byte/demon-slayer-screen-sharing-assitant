@@ -45,7 +45,7 @@ class Config:
     
     # Chat model for text conversations
     # Using meta/llama-3.3-70b-instruct as a good default
-    CHAT_MODEL = "meta/llama-3.3-70b-instruct"
+    CHAT_MODEL = "meta/llama-3.2-11b-vision-instruct"
     MODEL_NAME = CHAT_MODEL  # Alias for backward compatibility
     
     # Vision model for screen analysis

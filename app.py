@@ -92,9 +92,12 @@ def analyze():
         analysis = friday.analyze_screen(image_base64, user_question)
         
         return jsonify({'analysis': analysis})
-        
+   
+
     except Exception as e:
+        traceback.print_exc()
         return jsonify({'error': str(e)}), 500
+   
 
 
 @app.route('/api/capture', methods=['POST'])
